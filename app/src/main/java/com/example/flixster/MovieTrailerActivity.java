@@ -2,23 +2,64 @@ package com.example.flixster;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
+import com.codepath.asynchttpclient.AsyncHttpClient;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.example.flixster.databinding.ActivityMovieTrailerBinding;
+import com.example.flixster.models.Movie;
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import okhttp3.Headers;
+
 public class MovieTrailerActivity extends YouTubeBaseActivity {
+
+    ActivityMovieTrailerBinding binding;
+    public static final String TAG = "MovieTrailerActivity";
+    String videoKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_trailer);
+        binding = ActivityMovieTrailerBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        //setContentView(R.layout.activity_movie_trailer);
+        setContentView(view);
 
         // temporary test video id -- TODO replace with movie trailer video id
-        final String videoId = "tKodtNFpzBA";
+        final String videoId = getIntent().getStringExtra("id");
+        String VIDEOS_URL = String.format("https://api.themoviedb.org/3/movie/movie/%s/videos?api_key=50e888a9af93a602f489692751df7928", videoId);
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(VIDEOS_URL, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int i, Headers headers, JSON json) {
+                Log.d(TAG, "onSuccess");
+                JSONObject jsonObject = json.jsonObject;
+                try {
+                    JSONArray results = jsonObject.getJSONArray("results");
+                    JSONObject object = results.getJSONObject(0);
+                    videoKey = object.getString("key");
+                } catch (JSONException e) {
+                    Log.e(TAG, "Hit json exception", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int i, Headers headers, String s, Throwable throwable) {
+                Log.d(TAG, "onFailure");
+            }
+        });
 
         // resolve the player view from the layout
         YouTubePlayerView playerView = (YouTubePlayerView) findViewById(R.id.player);

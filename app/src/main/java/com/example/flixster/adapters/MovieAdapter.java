@@ -93,9 +93,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                 imageURL = movie.getPosterPath();
                 Glide.with(context).load(imageURL).centerInside().transform(new RoundedCornersTransformation(radius, margin)).placeholder(R.drawable.flicks_movie_placeholder).into(ivPoster);
             }
-
-            //Glide.with(context).load(imageURL).transform(new RoundedCornersTransformation(radius, margin)).into(ivPoster);
-            //Glide.with(context).load(imageURL).into(ivPoster);
         }
 
         // when the user clicks on a row, show MovieDetailsActivity for the selected movie
