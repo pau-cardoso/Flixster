@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterInside;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.flixster.MovieDetailsActivity;
 import com.example.flixster.R;
 import com.example.flixster.models.Movie;
@@ -24,6 +26,8 @@ import org.parceler.Parcels;
 
 import java.util.List;
 import java.util.concurrent.RecursiveAction;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
@@ -80,14 +84,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             tvTitle.setText(movie.getTitle());
             tvOverview.setText(movie.getOverview());
             String imageURL;
+            int radius = 30, margin = 10;
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 imageURL = movie.getBackdropPath();
+                Glide.with(context).load(imageURL).transform(new CenterInside(), new RoundedCorners(24)).placeholder(R.drawable.flicks_backdrop_placeholder).into(ivPoster);
             } else {
                 imageURL = movie.getPosterPath();
+                Glide.with(context).load(imageURL).centerInside().transform(new RoundedCornersTransformation(radius, margin)).placeholder(R.drawable.flicks_movie_placeholder).into(ivPoster);
             }
 
-            Glide.with(context).load(imageURL).into(ivPoster);
+            //Glide.with(context).load(imageURL).transform(new RoundedCornersTransformation(radius, margin)).into(ivPoster);
+            //Glide.with(context).load(imageURL).into(ivPoster);
         }
 
         // when the user clicks on a row, show MovieDetailsActivity for the selected movie
