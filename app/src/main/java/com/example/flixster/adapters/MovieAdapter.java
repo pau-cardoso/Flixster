@@ -1,6 +1,10 @@
 package com.example.flixster.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +15,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.flixster.MovieDetailsActivity;
 import com.example.flixster.R;
 import com.example.flixster.models.Movie;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.util.List;
 import java.util.concurrent.RecursiveAction;
@@ -34,6 +40,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        Log.d("MovieAdapter", "OnCreateViewHolder");
         View movieView = LayoutInflater.from(context).inflate(R.layout.item_movie, parent, false);
         return new ViewHolder(movieView);
     }
@@ -41,6 +48,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     // Involves populating data into the item through holder
     @Override
     public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
+        Log.d("MovieAdapter", "OnBindViewHolder" + position);
         // Get the movie at the position
         Movie movie = movies.get(position);
         // Bind the movie data into the ViewHolder
@@ -53,7 +61,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return movies.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView tvTitle;
         TextView tvOverview;
@@ -64,13 +72,34 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvOverview = itemView.findViewById(R.id.tvOverview);
             ivPoster = itemView.findViewById(R.id.ivPoster);
+            itemView.setOnClickListener(this);
 
         }
 
         public void bind(Movie movie) {
             tvTitle.setText(movie.getTitle());
             tvOverview.setText(movie.getOverview());
-            Glide.with(context).load(movie.getPosterPath()).into(ivPoster);
+            String imageURL;
+
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                imageURL = movie.getBackdropPath();
+            } else {
+                imageURL = movie.getPosterPath();
+            }
+
+            Glide.with(context).load(imageURL).into(ivPoster);
+        }
+
+        // when the user clicks on a row, show MovieDetailsActivity for the selected movie
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition(); // gets item position
+            if (position != RecyclerView.NO_POSITION) { // make sure the position is valid, i.e. actually exists in the view
+                Movie movie = movies.get(position); // get movie at the position
+                Intent intent = new Intent(context, MovieDetailsActivity.class); // create intent for the new activity
+                intent.putExtra(Movie.class.getSimpleName(), Parcels.wrap(movie)); // serialize the movie using parceler, use its short name as a key
+                context.startActivity(intent); // show the activity
+            }
         }
     }
 }
