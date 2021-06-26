@@ -33,15 +33,13 @@ public class MovieTrailerActivity extends YouTubeBaseActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMovieTrailerBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
-        //setContentView(R.layout.activity_movie_trailer);
         setContentView(view);
 
-        // temporary test video id -- TODO replace with movie trailer video id
-        final String videoId = getIntent().getStringExtra("id");
-        String VIDEOS_URL = String.format("https://api.themoviedb.org/3/movie/movie/%s/videos?api_key=50e888a9af93a602f489692751df7928", videoId);
+        String idMovie = getIntent().getStringExtra("idMovie");
+        String URL = String.format("https://api.themoviedb.org/3/movie/%s/videos?api_key=50e888a9af93a602f489692751df7928", idMovie);
 
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get(VIDEOS_URL, new JsonHttpResponseHandler() {
+        client.get(URL, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Headers headers, JSON json) {
                 Log.d(TAG, "onSuccess");
@@ -70,7 +68,7 @@ public class MovieTrailerActivity extends YouTubeBaseActivity {
             public void onInitializationSuccess(YouTubePlayer.Provider provider,
                                                 YouTubePlayer youTubePlayer, boolean b) {
                 // do any work here to cue video, play video, etc.
-                youTubePlayer.cueVideo(videoId);
+                youTubePlayer.cueVideo(videoKey);
             }
 
             @Override
